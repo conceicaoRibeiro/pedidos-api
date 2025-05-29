@@ -1,22 +1,21 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Compilar, testar e implantar o aplicativo Java dentro da AZURE.
+name: Build and deploy JAR app to Azure Web App - api-pedidos
 
-on: #Gatilho para executar a pipeline
-  push: #A pipeline será executada apóes um PUSH no repositório
-    branches: #O PUSH deverá ser feito na BRANCH main
-      - main  #Nome da Branch
-  workflow_dispatch:  #Executar o workflow
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
-jobs: #Etapas realizadas pela PIPELINES
-  build: # Etapa de COMPILAÇÃO ddo projeto
-    name: Compilação da aplicação Java
+jobs:
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: read #This is required for actions/checkout
 
-    steps: # Passos da compilação
+    steps:
       - uses: actions/checkout@v4
 
       - name: Set up Java version
@@ -25,17 +24,16 @@ jobs: #Etapas realizadas pela PIPELINES
           java-version: '21'
           distribution: 'microsoft'
 
-      - name: Compular o projeto com o Maven
+      - name: Build with Maven
         run: mvn clean install
 
-      - name: Upload do pacote compilado para implantação        
+      - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
           path: '${{ github.workspace }}/target/*.jar'
 
   deploy:
-  name: Implantação  da aplicação na Azure    
     runs-on: ubuntu-latest
     needs: build
     environment:
@@ -43,7 +41,7 @@ jobs: #Etapas realizadas pela PIPELINES
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
       
     steps:
-      - name: Download do pacote do build para implatação
+      - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: java-app
