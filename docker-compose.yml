@@ -1,4 +1,15 @@
 services:
+ pedidosapi:
+   build:
+    context: .
+    dockerfile: Dockerfile
+   ports:
+     - "8081:8081"
+   networks:
+     - pedidos-network
+   depends_on:
+     - postgres
+     - rabbitmq
  postgres:
    image: postgres:16
    container_name: pedidos-db
